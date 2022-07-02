@@ -1,0 +1,1093 @@
+---
+title: "> &nbsp;&nbsp; `r emo::ji('book')` `r emo::ji('computer')` <br>> &nbsp;&nbsp; R markdown"
+subtitle: ""
+author: "<br><br><b>Danielle Navarro</b>"
+date: ""
+output:
+  xaringan::moon_reader:
+    includes:
+      in_header: header.html
+    lib_dir: libs
+    css: ["style/xaringan-themer-bisque.css", "style/slides-style-bisque.css"]
+    nature:
+      highlightStyle: solarized-light
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+```{r child = "style/setup.Rmd"}
+```
+
+```{r load-packages, message=FALSE, echo=FALSE}
+library(tidyverse)
+```
+
+
+
+```{r meta, echo=FALSE}
+library(metathis)
+meta() %>%
+  meta_general(
+    description = "An introduction to R markdown",
+  ) %>% 
+  meta_name("github-repo" = "djnavarro/slides") %>% 
+  meta_social(
+    title = "An introduction to R markdown",
+    url = "https://slides.djnavarro.net/starting-rmarkdown/",
+    image = "https://slides.djnavarro.net/starting-rmarkdown/img/twitter-image.jpg",
+    image_alt = "",
+    og_type = "website",
+    og_author = "Danielle Navarro",
+    twitter_card_type = "summary_large_image",
+    twitter_creator = "@djnavarro"
+  )
+```
+
+
+```{r include=FALSE}
+hook_source <- knitr::knit_hooks$get('source')
+knitr::knit_hooks$set(source = function(x, options) {
+  x <- stringr::str_replace(x, "^[[:blank:]]?([^*].+?)[[:blank:]]*#<<[[:blank:]]*$", "*\\1")
+  hook_source(x, options)
+})
+
+num_fmt <- scales::number_format(big.mark = ",")
+```
+
+
+class: middle
+
+## What are we going to cover?
+
+- **Markdown:** a simple text-only format for writing documents
+- **R markdown:** a tool for mixing R code with markdown 
+
+---
+
+class: middle
+
+## What is the assumed knowledge?
+
+- This is an introductory unit
+- No previous knowledge of R is needed
+- No previous knowledge of markdown needed
+
+---
+
+class: middle
+
+## What do I need to do before starting?
+
+- Sign up for a free RStudio cloud account
+- https://rstudio.cloud/
+
+
+---
+
+class: middle
+
+## Where can I find the resources?
+
+- These slides: [slides.djnavarro.net/starting-rmarkdown](https://slides.djnavarro.net/starting-rmarkdown)
+- YouTube videos: [youtube.djnavarro.net/starting-rmarkdown](https://youtube.djnavarro.net/starting-rmarkdown)
+
+
+---
+
+## R markdown is a "chimera"
+
+.pull-left[
+```{r, echo=FALSE}
+knitr::include_graphics("img/chimera.jpg", dpi = 350)
+```
+]
+
+--
+
+.pull-right[
+
+<br>
+### On the input side...
+
+- Write text in markdown
+- Insert code using R
+- Write "metadata" with YAML
+- Insert equation with LaTeX
+]
+
+---
+
+## R markdown is a "chimera"
+
+.pull-left[
+```{r, echo=FALSE}
+knitr::include_graphics("img/chimera.jpg", dpi = 350)
+```
+]
+
+.pull-right[
+
+<br>
+### On the output side...
+
+- Output to HTML
+- Output to PDF
+- Output to Word
+- Many other variations too
+]
+
+---
+
+
+class: middle, inverse
+
+.hand[Lots of little things to learn!<br>We'll start with markdown...]
+
+
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[1]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Stating the problem...]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+
+---
+
+class: middle
+
+```{r, echo=FALSE}
+knitr::include_graphics("img/word_document_surface.png", dpi = 300)
+```
+
+
+---
+
+class: middle
+
+```{r, echo=FALSE}
+knitr::include_graphics("img/word_document_inside.png", dpi = 150)
+```
+
+---
+
+class: middle
+
+## Word documents are complicated
+
+- A .docx file is a compressed folder with lots of files
+- Your text is buried in with a lot of formatting information
+
+---
+
+class: middle
+
+```{r, echo=FALSE, out.height="80%"}
+knitr::include_graphics("img/html_document_surface.png")
+```
+
+
+
+---
+
+class: middle
+
+```{r, echo=FALSE}
+knitr::include_graphics("img/html_document_inside.png", dpi = 150)
+```
+
+
+---
+
+class: middle
+
+## HTML documents are complicated
+
+- Looks simple because I removed most formatting
+- Still unpleasant to look at
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[2]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Why markdown?]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+
+---
+
+class: middle
+
+## What do we want?
+
+- Something that... you can write in **plain text**
+- Something that... is **human readable**
+- Something that... allows **formatting**
+- Something that... can **build** to something pretty 
+
+---
+
+
+class: middle, inverse
+
+.hand[Here's an example of a markdown document...]
+
+
+---
+
+
+.pull-left-wide[
+```
+# Introduction
+
+Welcome to my **awesome** class. You will learn 
+all kinds of useful things about R markdown. 
+
+## Why should you care?
+
+- Markdown is simple and reproducible
+- You can make it pretty if you want to
+- The R Markdown variant lets you add R code
+
+## Where can you find these slides?
+
+https://slides.djnavarro.net/starting-rmarkdown
+```
+]
+
+---
+
+
+class: middle, inverse
+
+.hand[Here's what the output looks like...]
+
+
+---
+
+# Introduction
+
+Welcome to my **awesome** class. You will learn 
+all kinds of useful things about R markdown. 
+
+## Why should you care?
+
+- Markdown is simple and reproducible
+- You can make it pretty if you want to
+- The R Markdown variant lets you add R code
+
+## Where can you find these slides?
+
+https://slides.djnavarro.net/starting-rmarkdown
+
+---
+
+class: middle
+
+## Notice the theme!
+
+- My slides are written using markdown (...sort of)
+- So the markdown output you see here matches the slides theme
+- I'll talk about modifying themes later  
+
+---
+
+class: middle, inverse
+
+.hand[Okaaaay, but this seems really boring?]
+
+---
+
+class: middle, inverse
+
+.hand[... hm, yeah, but let me show you where it takes you later!]
+
+
+---
+
+class: middle
+
+## Professional websites
+
+```{r, echo=FALSE, out.height="70%", out.width="50%"}
+knitr::include_graphics("img/example_professional_site.png")
+```
+
+---
+
+class: middle
+
+## Visual blogs
+
+```{r, echo=FALSE, out.height="70%", out.width="50%"}
+knitr::include_graphics("img/example_visual_blog.png")
+```
+
+---
+
+class: middle
+
+## Books
+
+```{r, echo=FALSE, out.height="70%", out.width="80%"}
+knitr::include_graphics("img/example_book.png")
+```
+
+
+---
+
+class: middle
+
+## Academic papers
+
+```{r, echo=FALSE, out.height="70%", out.width="60%"}
+knitr::include_graphics("img/example_papers.png")
+```
+
+---
+
+class: middle
+
+## Slide decks
+
+```{r, echo=FALSE, out.height="70%", out.width="80%"}
+knitr::include_graphics("img/example_slides.png")
+```
+
+---
+
+class: middle
+
+## Résumés
+
+```{r, echo=FALSE, out.height="70%", out.width="80%"}
+knitr::include_graphics("img/example_resume.png")
+```
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[3]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Getting ready]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration:<br>Create an RStudio Cloud project]
+
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[4]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Starting markdown]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+
+---
+
+class: middle, inverse
+
+.hand[Okay, let's dive into the details...]
+
+
+---
+
+## Emphasising text
+
+--
+.pull-left[
+<br><br>
+### What you type...
+<br>
+```
+
+this is *italics*
+
+this is **bold**
+
+this is ***bold italics***
+```
+]
+--
+.pull-right[
+<br><br>
+### What you get...
+<br>
+
+this is *italics*
+
+this is **bold**
+
+this is ***bold italics***
+]
+
+---
+
+## Creating lists
+
+--
+.pull-left[
+<br><br>
+### What you type...
+<br>
+```
+- unnumbered lists
+- look like this
+
+1. numbered lists
+2. look like this
+```
+]
+--
+.pull-right[
+<br><br>
+### What you get...
+<br>
+
+- unnumbered lists
+- look like this
+
+1. numbered lists
+2. look like this
+]
+
+---
+
+## Creating headings
+
+--
+.pull-left[
+<br><br>
+### What you type...
+<br>
+```
+# Level 1 heading
+## Level 2 heading
+### Level 3 heading
+
+```
+]
+--
+.pull-right[
+<br><br>
+### What you get...
+<br>
+
+# Level 1 heading
+## Level 2 heading
+### Level 3 heading
+]
+
+
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration:<br>Write a markdown document]
+
+---
+
+class: middle, inverse
+
+.hand[Do it yourself!]
+
+- create your own RStudio Cloud project (see the demo)
+- open a new plain markdown document
+- save it as `my_first_markdown.md`
+- write some markdown, build it to HTML file
+- try to use all these markdown features
+
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[5]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[More markdown]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+
+---
+
+## Inserting hyperlinks
+
+--
+.pull-left-wide[
+<br><br>
+### What you type...
+<br>
+```
+https://placekitten.com
+
+[Placekitten](https://placekitten.com)
+```
+]
+--
+.pull-right-narrow[
+<br><br>
+### What you get...
+<br>
+https://placekitten.com
+
+[Placekitten](https://placekitten.com)
+]
+
+
+---
+
+## Inserting local images
+
+--
+.pull-left-wide[
+<br><br>
+### What you type...
+<br>
+```
+![](./img/rmarkdown.png)
+```
+]
+--
+.pull-right-narrow[
+<br><br>
+### What you get...
+<br>
+![](./img/rmarkdown.png)
+]
+
+
+---
+
+## Inserting images from the web
+
+--
+.pull-left-wide[
+<br><br>
+### What you type...
+<br>
+```
+![](https://placekitten.com/200/300)
+```
+]
+--
+.pull-right-narrow[
+<br><br>
+### What you get...
+<br>
+![](https://placekitten.com/200/300)
+]
+
+
+
+---
+
+## Using blockquotes
+
+--
+.pull-left[
+<br><br>
+### What you type...
+<br>
+```
+This is normal text
+> This is a block quote
+```
+]
+--
+.pull-right[
+<br><br>
+### What you get...
+This is normal text
+> This is a block quote
+]
+
+
+---
+
+## Using nested lists
+
+--
+.pull-left[
+<br><br>
+### What you type...
+<br>
+```
+1. First item in list 
+2. Second item in list
+  - first item in sub-list
+  - second item in sub-list
+3. Third item in list
+```
+]
+--
+.pull-right[
+<br><br>
+### What you get...
+<br>
+1. First item in list 
+2. Second item in list
+  - first item in sub-list
+  - second item in sub-list
+3. Third item in list
+]
+
+
+---
+
+class: middle, inverse
+
+.hand[Do it yourself!]
+
+- go back to your RStudio Cloud project
+- open your `my_first_markdown.md` document
+- edit the markdown, use these new features
+- save the document
+- build it to HTML
+
+
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[6]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[R markdown]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+---
+
+class: middle
+
+## What do we want?
+
+- Something that... lets you write text in **markdown**
+- Something that... lets you include **R code** (e.g. for data vis)
+- Something that... can **build** to HTML, PDF, Word, etc
+
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration:<br>Write an R markdown document]
+
+---
+
+class: middle
+
+## Let's dissect the document we just wrote!
+
+```{r, echo=FALSE, out.height="70%", out.width="60%"}
+knitr::include_graphics("img/my_first_rmd_plain.png", dpi = 200)
+
+```
+
+---
+
+## The part inside ` --- ` is the "YAML header"
+
+```{r, echo=FALSE, out.height="70%", out.width="60%"}
+knitr::include_graphics("img/my_first_rmd_yaml.png", dpi = 200)
+
+```
+
+
+---
+
+class: middle
+
+<h2>The part inside <code>&#96;&#96;&#96;{r}</code> is R code</h2>
+
+```{r, echo=FALSE, out.height="70%", out.width="60%"}
+knitr::include_graphics("img/my_first_rmd_r.png", dpi = 200)
+```
+
+---
+
+
+
+## The rest is markdown 
+
+```{r, echo=FALSE, out.height="70%", out.width="60%"}
+knitr::include_graphics("img/my_first_rmd_markdown.png", dpi = 200)
+```
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[7]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Custom documents]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+
+---
+
+## The YAML header is used for customisation
+
+```{r, echo=FALSE, out.height="70%", out.width="60%"}
+knitr::include_graphics("img/my_first_rmd_yaml.png", dpi = 200)
+
+```
+
+
+---
+
+class: middle
+
+## Wait... what's the YAML acronym?
+
+- Originally: "Yet Another Markup Language"
+- Later: "YAML Ain't Markup Language"
+- ... it really doesn't matter `r emo::ji("face_with_rolling_eyes")`
+
+---
+
+## Output HTML only
+```
+---
+title: "My First R Markdown Document"
+author: "Danielle J. Navarro"
+date: "10/02/2021"
+output: html_document
+---
+```
+
+---
+
+## Output HTML and PDF
+
+```
+---
+title: "My First R Markdown Document"
+author: "Danielle J. Navarro"
+date: "10/02/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+```
+
+--
+
+<br>
+- Notice the indentation
+- YAML is *very* picky about this
+
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration!]
+
+
+---
+
+## Themes for HTML documents
+
+```
+---
+output: 
+  html_document:
+    theme: readable
+---
+```
+
+--
+
+**Possible themes**: default, cerulean, journal, flatly, darkly, readable, spacelab, united, cosmo, lumen, paper, sandstone, simplex, yeti
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration!]
+
+
+---
+
+## Table of contents
+
+```
+output:
+  html_document:
+    toc: true
+    toc_float: true
+```
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration!]
+
+---
+
+class: middle, inverse
+
+.hand[Do it yourself!]
+
+- practice editing the YAML header
+- try creating different outputs and themes
+- try creating a floating table of contents
+- try to get it to not float!
+
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[8]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Inserting equations]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+
+---
+
+## An overview
+
+- Anything inside dollar signs `$` is treated as "inline" maths
+- Anything inside two dollar `$$` is a standalone equation
+- Whitespace matters: `$x$` is an equation, `$x $` is not
+- Equations follow "LaTeX" rules
+
+---
+
+## Equations are special
+
+.pull-left[
+```
+This $x^2$ is inline
+
+This equation is standalone
+$$
+a^2 + b^2 = c^2
+$$
+```
+]
+--
+.pull-right[
+This $x^2$ is inline
+
+This equation is standalone
+$$
+a^2 + b^2 = c^2
+$$
+]
+
+---
+
+## Literal $ signs are "easy"
+
+.pull-left[
+```
+$ is text
+
+$10 is text
+
+$10 and $20 are text
+
+$10 $ and $20 $ are text
+
+$10$ uses math mode
+```
+]
+--
+.pull-right[
+$ is text
+
+$10 is text
+
+$10 and $20 are text
+
+$10 $ and $20 $ are text
+
+$10$ uses math mode
+]
+
+---
+
+## Rescorla-Wagner model
+
+.pull-left-wide[
+```
+The formula for the associative strength $V$ 
+at time $t+1$ is given by 
+$$
+V^{t+1} = V^{t} + \Delta V
+$$
+
+where $\Delta V$ is given by
+
+$$
+\Delta V = \alpha \beta (\lambda - V_{tot})
+$$
+```
+]
+
+---
+
+
+
+## Rescorla-Wagner model
+
+.pull-left-wide[
+The formula for the associative strength $V$ 
+at time $t+1$ is given by 
+$$
+V^{t+1} = V^{t} + \Delta V
+$$
+
+where $\Delta V$ is given by
+
+$$
+\Delta V = \alpha \beta (\lambda - V_{tot})
+$$
+]
+
+
+---
+
+class: middle, inverse
+
+.hand[There's more to learn about LaTeX equations<br>but that is a topic for another time!]
+
+
+---
+
+class: middle, inverse
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.pull-left-narrow[
+  .huge-bisque-number[9]
+]
+.pull-right-wide[
+<br><br><br>
+.larger[.embolden[Publishing documents]]
+```{r, echo=FALSE}
+#knitr::include_graphics("img/blogdown.png", dpi = 1000)
+```
+]
+
+---
+
+class: middle, inverse
+
+.hand[Demonstration!]
+
+- upload the .Rmd and .html files: e.g., dropbox, github, osf
+- one-click publishing with RStudio through RPubs
+
+
+
+---
+
+class: middle
+
+background-image: url("img/silhouette.jpg")
+background-size: cover
+
+.hand[And we're done!<br>For more information on R markdown...] 
+
+<a href="https://bookdown.org/yihui/rmarkdown/">
+```{r, echo=FALSE, out.height="30%", out.width="30%"}
+knitr::include_graphics("img/rmd-guide-cover.png", dpi = 200)
+```
+</a>

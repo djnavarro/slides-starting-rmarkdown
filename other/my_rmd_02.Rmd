@@ -1,0 +1,21 @@
+---
+title: "My First R Markdown Document"
+author: "Danielle J. Navarro"
+date: "10/02/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+This section of the document is plain markdown. I'm adding *italics* and **boldface** text in the same way I would in any other markdown document.
+
+- I am adding a list
+- in the same way also
+
+In the next section I am going to add a "chunk" of R code:
+
+```{r}
+print("hello world!")
+```
+
+You can see that (by default) the "knitted" document shows my code first, which is then followed by the output that R generates when this code is "executed".
